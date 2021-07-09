@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { helloMessage } from './controller';
+import { getSubjects } from './controllers/subjectController';
 
 const router = Router();
 
-router.get('/:name', helloMessage);
+router.get('/subjects', getSubjects);
 
 export default router;

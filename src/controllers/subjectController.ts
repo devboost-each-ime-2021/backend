@@ -1,26 +1,30 @@
 import { Request, Response } from 'express';
-
-const subjects = [
-  {
-    id: 1,
-    name: 'Calculo I',
-    description: 'Materia legal de fazer conta',
-    professor: 'Alexandre Ramos',
-  },
-  {
-    id: 2,
-    name: 'Introducao a programacao',
-    description: 'ad;asdfsdajflkasdjkljklsadf',
-    professor: 'Marcio Moretto',
-  },
-  {
-    id: 3,
-    name: 'Fundamentos de astronomia',
-    description: 'planetas e esses bgl',
-    professor: 'Reinaldo Santos',
-  },
-];
+import { subjects, users_subjects } from '../db';
 
 export function getSubjects(req: Request, res: Response): Response {
   return res.status(200).json(subjects);
+}
+
+export function getUserSubjects(req: Request, res: Response): Response {
+  const id = req.params.id;
+
+  const userSubject = users_subjects.find((user) => {
+    return user.id === Number(id);
+  });
+
+  if (userSubject === undefined) {
+    return res.status(404).json({
+      error: 'User not found! :(',
+    });
+  }
+
+  const subjectIDs = userSubject?.subjects;
+
+  const userSubjects = subjectIDs?.map((subjectID) => {
+    return subjects.find((subject) => {
+      return subject.id === subjectID;
+    });
+  });
+
+  return res.status(200).json(userSubjects);
 }

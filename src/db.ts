@@ -8,7 +8,9 @@ export interface Subject {
 export interface User {
   id: number;
   name: string;
+  username: string;
   email: string;
+  password: string;
 }
 
 export interface UserSubject {
@@ -41,22 +43,30 @@ export const users: User[] = [
   {
     id: 1,
     name: 'Roberto Carlos',
+    username: 'robertinhodograu',
     email: 'robertocarlosobrabo@email.com',
+    password: 'senhabemsegura',
   },
   {
     id: 2,
     name: 'Geraldonimo Dias',
+    username: 'geraldao',
     email: 'geraldonimo.dias@email.com',
+    password: 'senhabemsegura',
   },
   {
     id: 3,
     name: 'Abigaildo Lima',
+    username: 'ablima',
     email: 'abigaildolima@email.com',
+    password: 'senhabemsegura',
   },
   {
     id: 4,
     name: 'Giuseppe Cadura',
-    email: 'giusepe.cadura@email.com',
+    username: 'pecadura123',
+    email: 'giuseppe.cadura@email.com',
+    password: 'senhabemsegura',
   },
 ];
 

@@ -18,6 +18,59 @@ export interface UserSubject {
   subjects: number[];
 }
 
+export interface SubjectSectionItem {
+  id: number;
+  title: string;
+  subject_section_id: number;
+}
+
+export interface SubjectSection {
+  id: number;
+  title: string;
+  subject_id: number;
+}
+
+export const sectionItems: SubjectSectionItem[] = [
+  { id: 1, title: 'Derivada logarítima', subject_section_id: 1 },
+  { id: 2, title: "Regra de L'Hospital", subject_section_id: 1 },
+  { id: 3, title: 'X tendendo a A', subject_section_id: 2 },
+  { id: 4, title: 'Definição precisa de limite', subject_section_id: 2 },
+  { id: 5, title: '* e demais', subject_section_id: 3 },
+  { id: 6, title: 'maloca', subject_section_id: 3 },
+  { id: 7, title: 'busca binaria', subject_section_id: 4 },
+  { id: 8, title: 'busca sequencial', subject_section_id: 4 },
+  { id: 9, title: 'segunda lei de kepler', subject_section_id: 5 },
+  { id: 10, title: 'terceira lei de kepler', subject_section_id: 5 },
+];
+
+export const sections: SubjectSection[] = [
+  {
+    id: 1,
+    title: 'Derivada',
+    subject_id: 1,
+  },
+  {
+    id: 2,
+    title: 'Limites',
+    subject_id: 1,
+  },
+  {
+    id: 3,
+    title: 'Ponteiros',
+    subject_id: 2,
+  },
+  {
+    id: 4,
+    title: 'Vetores',
+    subject_id: 2,
+  },
+  {
+    id: 5,
+    title: 'Leis de Kepler',
+    subject_id: 3,
+  },
+];
+
 export const subjects: Subject[] = [
   {
     id: 1,

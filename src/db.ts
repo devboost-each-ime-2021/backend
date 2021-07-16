@@ -61,7 +61,7 @@ export const sections: SubjectSection[] = [
   },
   {
     id: 4,
-    title: 'Vetores',
+    title: 'Algoritmos de busca',
     subject_id: 2,
   },
   {

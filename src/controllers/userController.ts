@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { users, User } from '../db';
+import { users, User, users_subjects } from '../db';
 
 export function signIn(req: Request, res: Response): Response {
   const { user, password } = req.body;
@@ -26,8 +26,63 @@ export function signIn(req: Request, res: Response): Response {
   });
 }
 
+function isValidUser(user: User) {
+  const { name, username, email, password } = user;
+  console.log(user);
+  const errors: string[] = [];
+
+  if (!name) {
+    errors.push('Nome vazio');
+    console.log('vazio');
+  }
+
+  if (!username) {
+    errors.push('Username vazio');
+  } else {
+    const result = users.find((u) => u.username === username);
+    if (result) {
+      errors.push('Username já existe');
+    }
+  }
+  if (!email) {
+    errors.push('Email vazio');
+  } else {
+    const result = users.find((u) => u.email === email);
+    if (result) {
+      errors.push('Email já existente');
+    } else {
+      const regex = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+(\.[a-z]+)?$/i;
+      if (!regex.test(email)) {
+        errors.push('Formato de email inválido');
+      }
+    }
+  }
+  if (!password) {
+    errors.push('Senha vazia');
+  } else if (password.length < 6) {
+    errors.push('Senha com menos de 6 caracteres');
+  }
+
+  if (errors.length > 0) {
+    return {
+      isValid: false,
+      errors,
+    };
+  }
+
+  return {
+    isValid: true,
+  };
+}
+
 export function insertUser(req: Request, res: Response): Response {
   const { name, username, email, password } = req.body;
+  const { isValid, errors } = isValidUser(req.body);
+  if (!isValid) {
+    return res.status(400).json({
+      message: errors,
+    });
+  }
 
   const lastId = users[users.length - 1].id;
 
@@ -40,6 +95,10 @@ export function insertUser(req: Request, res: Response): Response {
   } as User;
 
   users.push(newUser);
+  users_subjects.push({
+    id: newUser.id,
+    subjects: [],
+  });
 
   const response = Object.assign({}, newUser) as any;
   delete response.password;

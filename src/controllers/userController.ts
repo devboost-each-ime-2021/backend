@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { users } from '../db';
+import { users, User } from '../db';
 
 export function signIn(req: Request, res: Response): Response {
   const { user, password } = req.body;
@@ -24,4 +24,29 @@ export function signIn(req: Request, res: Response): Response {
     username,
     email,
   });
+}
+
+export function insertUser(req: Request, res: Response): Response {
+  const { name, username, email, password } = req.body;
+
+  const lastId = users[users.length - 1].id;
+
+  const newUser = {
+    id: lastId + 1,
+    name,
+    username,
+    email,
+    password,
+  } as User;
+
+  users.push(newUser);
+
+  const response = Object.assign({}, newUser) as any;
+  delete response.password;
+
+  return res.status(200).json(response);
+}
+
+export function listUsers(req: Request, res: Response): Response {
+  return res.status(200).json(users);
 }

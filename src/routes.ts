@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { getSubjects, getUserSubjects } from './controllers/subjectController';
-import { signIn } from './controllers/userController';
+import { signIn, insertUser, listUsers } from './controllers/userController';
 
 const router = Router();
 
 router.get('/subjects', getSubjects);
 
+router.post('/users', insertUser);
+router.get('/users', listUsers);
 router.get('/users/:id/subjects', getUserSubjects);
 
 router.post('/login', signIn);

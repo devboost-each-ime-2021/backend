@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { DBConnection } from '../dbConnection';
 import { users, User, users_subjects } from '../db';
 
 export function signIn(req: Request, res: Response): Response {
@@ -75,7 +76,10 @@ function isValidUser(user: User) {
   };
 }
 
-export function insertUser(req: Request, res: Response): Response {
+export async function insertUser(
+  req: Request,
+  res: Response
+): Promise<Response> {
   const { name, username, email, password } = req.body;
   const { isValid, errors } = isValidUser(req.body);
   if (!isValid) {
@@ -99,6 +103,15 @@ export function insertUser(req: Request, res: Response): Response {
     id: newUser.id,
     subjects: [],
   });
+
+  const database = await DBConnection.getDB();
+
+  const usersCollection = database.collection('users');
+
+  const dbUser = Object.assign({}, newUser) as any;
+  delete dbUser.id;
+
+  await usersCollection.insertOne(dbUser);
 
   const response = Object.assign({}, newUser) as any;
   delete response.password;

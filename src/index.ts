@@ -1,15 +1,20 @@
 import express from 'express';
 import cors from 'cors';
 import router from './routes';
+import { MongoClient } from 'mongodb';
 
-const port = 3000;
+async function bootstrap() {
+  const port = 3000;
 
-const app = express();
+  const app = express();
 
-app.use(express.json());
+  app.use(express.json());
 
-app.use(cors());
+  app.use(cors());
 
-app.use(router);
+  app.use(router);
 
-app.listen(port, (): void => console.log('server is running!'));
+  app.listen(port, (): void => console.log('server is running!'));
+}
+
+bootstrap();

@@ -1,43 +1,48 @@
 import { Request, Response } from 'express';
-import { subjects, users_subjects, sections, sectionItems } from '../db';
+import { DBConnection } from '../dbConnection';
+import { ObjectId } from 'mongodb';
 
-export function getSubjects(req: Request, res: Response): Response {
+export async function getSubjects(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const database = await DBConnection.getDB();
+
+  const subjects = await database.collection('subjects').find().toArray();
+
   return res.status(200).json(subjects);
 }
 
-export function getUserSubjects(req: Request, res: Response): Response {
+export async function getUserSubjects(
+  req: Request,
+  res: Response
+): Promise<Response> {
   const id = req.params.id;
 
-  const userSubject = users_subjects.find((user) => {
-    return user.id === Number(id);
+  const database = await DBConnection.getDB();
+  const user = await database.collection('users').findOne({
+    _id: new ObjectId(id),
   });
 
-  if (userSubject === undefined) {
+  if (!user) {
     return res.status(404).json({
       error: 'User not found! :(',
     });
   }
 
-  const subjectIDs = userSubject?.subjects;
+  const subjectIDs = user?.subjects;
+  console.log(subjectIDs);
+  const subjects = await database.collection('subjects');
 
-  const userSubjects = subjectIDs
-    ?.map((subjectID) => {
-      return subjects.find((subject) => {
-        return subject.id === subjectID;
+  const userSubjects = (await subjects.find().toArray()).filter(
+    (subject: any) => {
+      return subjectIDs.find((id: ObjectId) => {
+        return id.toString() === subject._id.toString();
       });
-    })
-    .map((subject) => {
-      const subjectSections = sections
-        .filter((section) => subject?.id === section.subject_id)
-        .map((section) => {
-          const items = sectionItems.filter(
-            (item) => section.id === item.subject_section_id
-          );
-          return { ...section, items };
-        });
+    }
+  );
 
-      return { ...subject, sections: subjectSections };
-    });
+  console.log(userSubjects);
 
   return res.status(200).json(userSubjects);
 }

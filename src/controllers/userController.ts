@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { DBConnection } from '../dbConnection';
-import { users, User, users_subjects } from '../db';
 
 export async function signIn(req: Request, res: Response): Promise<Response> {
   const { user, password } = req.body;
@@ -35,10 +34,14 @@ export async function signIn(req: Request, res: Response): Promise<Response> {
   });
 }
 
-function isValidUser(user: User) {
+async function isValidUser(user: any) {
   const { name, username, email, password } = user;
   console.log(user);
   const errors: string[] = [];
+
+  const database = await DBConnection.getDB();
+
+  const users = database.collection('users');
 
   if (!name) {
     errors.push('Nome vazio');
@@ -48,7 +51,7 @@ function isValidUser(user: User) {
   if (!username) {
     errors.push('Username vazio');
   } else {
-    const result = users.find((u) => u.username === username);
+    const result = await users.findOne({ username });
     if (result) {
       errors.push('Username já existe');
     }
@@ -56,7 +59,7 @@ function isValidUser(user: User) {
   if (!email) {
     errors.push('Email vazio');
   } else {
-    const result = users.find((u) => u.email === email);
+    const result = await users.findOne({ email });
     if (result) {
       errors.push('Email já existente');
     } else {
@@ -89,7 +92,7 @@ export async function insertUser(
   res: Response
 ): Promise<Response> {
   const { name, username, email, password } = req.body;
-  const { isValid, errors } = isValidUser(req.body);
+  const { isValid, errors } = await isValidUser(req.body);
   if (!isValid) {
     return res.status(400).json({
       message: errors,

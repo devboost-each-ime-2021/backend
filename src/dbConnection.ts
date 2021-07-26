@@ -1,10 +1,9 @@
 import { MongoClient, Db } from 'mongodb';
 
 export class DBConnection {
-  private static Client:MongoClient;
+  private static Client: MongoClient;
 
-  public static async function getDB():Promise<Db> {
-
+  public static async getDB(): Promise<Db> {
     if (!this.Client) {
       const dbUSER = process.env.MONGO_USER;
       const dbPASS = process.env.MONGO_PASS;

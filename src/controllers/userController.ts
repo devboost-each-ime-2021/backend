@@ -2,25 +2,33 @@ import { Request, Response } from 'express';
 import { DBConnection } from '../dbConnection';
 import { users, User, users_subjects } from '../db';
 
-export function signIn(req: Request, res: Response): Response {
+export async function signIn(req: Request, res: Response): Promise<Response> {
   const { user, password } = req.body;
 
-  const result = users.find((dbUser) => {
-    return (
-      (user === dbUser.username || user === dbUser.email) &&
-      password === dbUser.password
-    );
+  const database = await DBConnection.getDB();
+  const dbUsers = database.collection('users');
+
+  let dbUser = await dbUsers.findOne({
+    username: user,
+    password,
   });
 
-  if (!result) {
+  if (!dbUser) {
+    dbUser = await dbUsers.findOne({
+      email: user,
+      password,
+    });
+  }
+
+  if (!dbUser) {
     return res.status(404).json({
       message: 'User or password not valid',
     });
   }
 
-  const { name, username, email, id } = result;
+  const { _id, name, username, email } = dbUser;
   return res.status(200).json({
-    id,
+    id: _id,
     name,
     username,
     email,
@@ -88,37 +96,29 @@ export async function insertUser(
     });
   }
 
-  const lastId = users[users.length - 1].id;
-
   const newUser = {
-    id: lastId + 1,
     name,
     username,
     email,
     password,
-  } as User;
-
-  users.push(newUser);
-  users_subjects.push({
-    id: newUser.id,
-    subjects: [],
-  });
+  };
 
   const database = await DBConnection.getDB();
 
   const usersCollection = database.collection('users');
 
-  const dbUser = Object.assign({}, newUser) as any;
-  delete dbUser.id;
+  await usersCollection.insertOne(newUser);
 
-  await usersCollection.insertOne(dbUser);
+  delete newUser.password;
 
-  const response = Object.assign({}, newUser) as any;
-  delete response.password;
-
-  return res.status(200).json(response);
+  return res.status(200).json(newUser);
 }
 
-export function listUsers(req: Request, res: Response): Response {
-  return res.status(200).json(users);
+export async function listUsers(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const database = await DBConnection.getDB();
+  const dbUsers = await database.collection('users').find().toArray();
+  return res.status(200).json(dbUsers);
 }
